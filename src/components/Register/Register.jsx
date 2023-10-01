@@ -1,4 +1,8 @@
-import { createHashRouter } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import auth from "../../firebase/firebase.config";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -11,7 +15,8 @@ const Register = () => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-    console.log(email, password);
+    const accepted = e.target.terms.checked;
+    console.log(email, password, accepted);
     setRegisterError("");
     setSuccess("");
     if (password.length < 6) {
@@ -22,8 +27,11 @@ const Register = () => {
         "Your password should have at least one upper case characters"
       );
       return;
+    } else if (!accepted) {
+      setRegisterError("please accept our terms and conditions!");
+      return;
     }
-    createHashRouter(auth, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log(result.user);
         setSuccess("User Created Successfully");
@@ -39,7 +47,7 @@ const Register = () => {
         <h2 className="text-3xl mb-8">Please Register</h2>
         <form onSubmit={handleRegister}>
           <input
-            className="mb-4 w-3/4  py-2 px-4 rounded"
+            className="mb-4 w-full  py-2 px-4 rounded"
             type="email"
             name="email"
             placeholder="Email Address"
@@ -48,7 +56,7 @@ const Register = () => {
           />
           <br />
           <input
-            className="mb-4 w-3/4 py-2 px-4 rounded"
+            className="mb-4 w-full py-2 px-4 rounded"
             type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
@@ -56,14 +64,21 @@ const Register = () => {
             id=""
           />
           <span
-            className="absolute mt-3 ml-2"
+            className="absolute mt-3"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <FaEyeSlash></FaEyeSlash> : <FaEye></FaEye>}
           </span>
           <br />
+          <div className="mt-6">
+            <input type="checkbox" name="terms" id="terms" />
+            <label className="ml-2" htmlFor="terms">
+              Accept our terms and <a href=""> terms and condition</a>
+            </label>
+          </div>
+          <br />
           <input
-            className=" btn btn-secondary  w-3/4 mb-4 "
+            className=" btn btn-secondary  w-full mb-4 "
             type="submit"
             value="Register"
           />
