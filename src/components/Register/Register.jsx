@@ -14,10 +14,11 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const handleRegister = (e) => {
     e.preventDefault();
+    const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
     const accepted = e.target.terms.checked;
-    console.log(email, password, accepted);
+    console.log(name, email, password, accepted);
     setRegisterError("");
     setSuccess("");
     if (password.length < 6) {
@@ -36,6 +37,19 @@ const Register = () => {
       .then((result) => {
         console.log(result.user);
         setSuccess("User Created Successfully");
+
+        // Update profile
+        updateProfile(result.user, {
+          displayName: name,
+          photoURL: "https://example.com/jane-q-user/profile.jpg",
+        })
+          .then(() => console.log("profile update"))
+          .catch();
+
+        // send verification email:
+        sendEmailVerification(result.user).then(() => {
+          alert("Please check your email and verify your account");
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -47,6 +61,15 @@ const Register = () => {
       <div className="mx-auto md:w-1/2">
         <h2 className="text-3xl mb-8">Please Register</h2>
         <form onSubmit={handleRegister}>
+          <input
+            className="mb-4 w-full  py-2 px-4 rounded"
+            type="text"
+            name="name"
+            placeholder="Your Name"
+            required
+            id=""
+          />
+          <br />
           <input
             className="mb-4 w-full  py-2 px-4 rounded"
             type="email"
